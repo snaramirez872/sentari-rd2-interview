@@ -1,11 +1,12 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
+import { extractEmbedding } from "./steps/embedding";
 
 export function runPipeline(text: string) {
   // Step 1 - RAW_TEXT_IN - Accept the Transcript
   const rawText = extractRawText(text);
   // Step 2 - EMBEDDING - Create n-dim MiniLM vector (or mock)
-
+  const embedding = extractEmbedding(rawText)
   // Step 3 - FETCH_RECENT - Load Last 5 Entries
 
   // Step 4 - FETCH_PROFILE - Load or init User Profile
