@@ -1,6 +1,17 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
 import { extractEmbedding } from "./steps/embedding";
+import { store } from "./store"; 
+
+const userId = "demo";        // temp hard-code
+
+// ── Step 3 – FETCH_RECENT ─────────────────────────────
+const recent = store.getLastEntries(userId, 5);
+log("[FETCH_RECENT]", { recent });
+
+// ── Step 4 – FETCH_PROFILE ────────────────────────────
+let profile = store.getProfile(userId);
+log("[FETCH_PROFILE]", { profile });
 
 export function runPipeline(text: string) {
   // Step 1 - RAW_TEXT_IN - Accept the Transcript
