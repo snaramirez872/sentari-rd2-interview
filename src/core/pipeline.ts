@@ -1,10 +1,14 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
 import { extractEmbedding } from "./steps/embedding";
+<<<<<<< HEAD
 import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";
 import { generateEmpathicReply } from "./steps/gptReply";
+=======
+import { parseEntry } from "./steps/parseEntry";
+>>>>>>> 7841311 (feat: implement step 6 PARSE_ENTRY with rule-based extraction)
 
 export async function runPipeline(text: string) {
   // Step 1 - RAW_TEXT_IN - Accept the Transcript
@@ -23,6 +27,7 @@ export async function runPipeline(text: string) {
   const metaData = extractMetaData(rawText);
 
   // Step 6 - PARSE_ENTRY - Use ChatGPT-1 or rule-based extraction
+<<<<<<< HEAD
   // TODO: Implement parsing logic
   const parsedEntry = {
     theme: ["general"],
@@ -33,6 +38,10 @@ export async function runPipeline(text: string) {
     bucket: ["daily"]
   };
 
+=======
+  const parsedEntry = parseEntry(rawText);
+  console.log(`[PARSE_ENTRY] input=<${rawText.substring(0, 50)}...> | output=<${parsedEntry.theme.join(', ')}> | note=<Parsed entry fields>`);
+>>>>>>> 7841311 (feat: implement step 6 PARSE_ENTRY with rule-based extraction)
   // Step 7 - CARRY_IN - Check if theme/vibe overlap or cosine > 0.86
   // TODO: Implement carry-in logic
 
@@ -59,9 +68,12 @@ export async function runPipeline(text: string) {
     rawText,
     metaData,
     parsedEntry,
+<<<<<<< HEAD
     savedEntry,
     updatedProfile,
     empathicResponse,
     recentEntries: recentEntries.length
+=======
+>>>>>>> 7841311 (feat: implement step 6 PARSE_ENTRY with rule-based extraction)
   };
 }
