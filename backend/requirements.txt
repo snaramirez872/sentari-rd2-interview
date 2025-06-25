@@ -1,3 +1,5 @@
 fastapi==0.115.13
 uvicorn==0.34.3
 sentence-transformers==4.1.0
+faster-whisper==1.1.1
+python-multipart
