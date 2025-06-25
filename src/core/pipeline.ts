@@ -4,7 +4,7 @@ import { extractEmbedding, cosineSimilarity } from "./steps/embedding";
 import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";
-import { generateEmpathicReply } from "./steps/gptReply";
+import { generateEmpathicReply, generateProfileBasedReply } from "./steps/gptReply";
 import { checkCarryIn } from "./steps/carryIn";
 import { checkContrast } from "./steps/contrastCheck";
 
@@ -42,17 +42,19 @@ export async function runPipeline(text: string) {
   const emotionFlip = checkContrast(parsedEntry, currentProfile);
 
   // Step 9 - PROFILE_UPDATE - Mutate profile fields
-  const updatedProfile = updateProfile(currentProfile, parsedEntry);
+  const updatedProfile = updateProfile(currentProfile, parsedEntry, carryIn, emotionFlip);
   await profileManager.saveProfile(updatedProfile);
 
   // Step 10 - SAVE_ENTRY - Save full object
-  const savedEntry = await entryStorage.saveEntry(rawText, parsedEntry, metaData, embedding);
+  const savedEntry = await entryStorage.saveEntry(rawText, parsedEntry, metaData, embedding, carryIn);
 
   // Step 11 - GPT_REPLY - Generate <= 55-char empathic response
-  const empathicResponse = generateEmpathicReply(rawText, parsedEntry, metaData);
+  const empathicResponse = entryStorage.getEntryCount() >= 99
+  ? generateProfileBasedReply(rawText, parsedEntry, currentProfile, carryIn, emotionFlip)
+  : generateEmpathicReply(rawText, parsedEntry, metaData, carryIn, emotionFlip, currentProfile);
 
   // Step 12 - PUBLISH - Package `{entryId, response_text, carry_in}`
-  // TODO: Implement publishing logic
+  // TODO: Implement publishing logicZ
 
   // Step 13 - COST_LATENCY_LOG - Print mock cost + time used
   // TODO: Implement cost and latency logging

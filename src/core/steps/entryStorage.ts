@@ -23,13 +23,15 @@ class EntryStorage {
    * @param parsedEntry - Parsed analysis of the entry
    * @param metaData - Extracted metadata
    * @param embedding - Vector embedding of the text
+   * @param carryIn - Whether the entry is a carry-in
    * @returns Saved entry with ID and timestamp
    */
   async saveEntry(
     rawText: string,
     parsedEntry: ParsedEntry,
     metaData: MetaData,
-    embedding: Embedding
+    embedding: Embedding,
+    carryIn: boolean
   ): Promise<FullEntries> {
     console.log(`[ENTRY_STORAGE] input=<${rawText.substring(0, 50)}...> | parsed=<${JSON.stringify(parsedEntry)}>`);
 
@@ -45,7 +47,8 @@ class EntryStorage {
       parsed: parsedEntry,
       meta: metaData,
       embedding: embedding,
-      timestamp: timestamp
+      timestamp: timestamp,
+      carryIn: carryIn
     };
 
     // Store in memory

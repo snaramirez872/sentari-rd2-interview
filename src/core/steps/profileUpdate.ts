@@ -7,9 +7,11 @@ import { Profile, ParsedEntry } from "@/lib/types";
  * 
  * @param currentProfile - Current user profile
  * @param parsedEntry - Parsed analysis of new entry
+ * @param carryIn - Whether the entry is a carry-in
+ * @param emotionalFlip - Whether the entry is an emotional flip
  * @returns Updated Profile object
  */
-export function updateProfile(currentProfile: Profile, parsedEntry: ParsedEntry): Profile {
+export function updateProfile(currentProfile: Profile, parsedEntry: ParsedEntry, carryIn: boolean, emotionalFlip: boolean): Profile {
   console.log(`[PROFILE_UPDATE] input=<${JSON.stringify(currentProfile)}> | new_entry=<${JSON.stringify(parsedEntry)}>`);
 
   // Create a copy of current profile to mutate

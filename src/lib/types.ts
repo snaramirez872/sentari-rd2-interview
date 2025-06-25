@@ -38,6 +38,7 @@ export type FullEntries = {
     meta: MetaData;
     embedding: Embedding;
     timestamp: string;
+    carryIn: boolean;
 };
 
 // Response
