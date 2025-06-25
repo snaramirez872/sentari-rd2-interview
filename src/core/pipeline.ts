@@ -1,10 +1,12 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
-import { extractEmbedding } from "./steps/embedding";
+import { extractEmbedding, cosineSimilarity } from "./steps/embedding";
 import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";
 import { generateEmpathicReply } from "./steps/gptReply";
+import { checkCarryIn } from "./steps/carryIn";
+import { checkContrast } from "./steps/contrastCheck";
 
 export async function runPipeline(text: string) {
   // Step 1 - RAW_TEXT_IN - Accept the Transcript
@@ -34,10 +36,10 @@ export async function runPipeline(text: string) {
   };
 
   // Step 7 - CARRY_IN - Check if theme/vibe overlap or cosine > 0.86
-  // TODO: Implement carry-in logic
+  const carryIn = checkCarryIn(parsedEntry, embedding, recentEntries);
 
   // Step 8 - CONTRAST_CHECK - Compare new vibe vs dominant profile vibe
-  // TODO: Implement contrast checking
+  const emotionFlip = checkContrast(parsedEntry, currentProfile);
 
   // Step 9 - PROFILE_UPDATE - Mutate profile fields
   const updatedProfile = updateProfile(currentProfile, parsedEntry);
