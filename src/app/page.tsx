@@ -20,14 +20,15 @@ export default function Home() {
       setAudioURL(URL.createObjectURL(blob));
 
       const formData = new FormData();
-      formData.append("audio", blob);
+      formData.append("audio", blob, "recording.webm");
 
-      const res = await fetch("/api/audio", {
+      const res = await fetch("http://127.0.0.1:8000/transcribe", {
         method: "POST",
         body: formData,
       });
 
       const data = await res.json();
+      console.log("Transcript:", data.transcript)
       setResult(data);
     };
 
