@@ -1,6 +1,7 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
 import { extractEmbedding } from "./steps/embedding";
+import { parseEntry } from "./steps/parseEntry";
 import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";
@@ -23,15 +24,8 @@ export async function runPipeline(text: string) {
   const metaData = extractMetaData(rawText);
 
   // Step 6 - PARSE_ENTRY - Use ChatGPT-1 or rule-based extraction
-  // TODO: Implement parsing logic
-  const parsedEntry = {
-    theme: ["general"],
-    vibe: ["neutral"],
-    intent: "reflection",
-    subtext: "personal thought",
-    persona_trait: ["thoughtful"],
-    bucket: ["daily"]
-  };
+  const parsedEntry = parseEntry(rawText);
+  console.log(`[PARSE_ENTRY] input=<${rawText.substring(0, 50)}...> | output=<${parsedEntry.theme.join(', ')}> | note=<Parsed entry fields>`);
 
   // Step 7 - CARRY_IN - Check if theme/vibe overlap or cosine > 0.86
   // TODO: Implement carry-in logic
