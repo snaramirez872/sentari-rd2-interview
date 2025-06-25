@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { TranscriptResponse } from "@/lib/types";
+import { runPipeline } from "@/core/pipeline";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
-  const [result, setResult] = useState<TranscriptResponse | null>(null);
+  const [result, setResult] = useState<string | null>(null);
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -29,8 +29,9 @@ export default function Home() {
       });
 
       const data = await res.json();
-      console.log("Transcript:", data.transcript)
-      setResult(data);
+      const pipelineRespone = await runPipeline(data.transcript)
+      console.log(pipelineRespone)
+      setResult(pipelineRespone.empathicResponse);
     };
 
     mediaRecorder.start();
