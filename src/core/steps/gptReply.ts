@@ -1,4 +1,5 @@
 import { ParsedEntry, MetaData, Profile } from "@/lib/types";
+import { entryStorage } from "./entryStorage"; // Import to check entry count
 
 /**
  * STEP 11 - GPT_REPLY
@@ -8,15 +9,39 @@ import { ParsedEntry, MetaData, Profile } from "@/lib/types";
  * @param rawText - Original diary text
  * @param parsedEntry - Parsed analysis of the entry
  * @param metaData - Extracted metadata
+ * @param carryIn - Whether entry continues recent themes/vibes 
+ * @param emotionFlip - Whether vibe differs from dominant vibe 
+ * @param profile - Current user profile for context
  * @returns Empathetic response string
  */
 export function generateEmpathicReply(
   rawText: string,
   parsedEntry: ParsedEntry,
-  metaData: MetaData
+  metaData: MetaData,
+  carryIn: boolean,
+  emotionalFlip: boolean,
+  profile: Profile
 ): string {
-  console.log(`[GPT_REPLY] input=<${rawText.substring(0, 50)}...> | vibe=<${parsedEntry.vibe.join(', ')}> | theme=<${parsedEntry.theme.join(', ')}>`);
+  // Input validation
+  if (!rawText || !parsedEntry || !metaData || !profile) {
+    console.log(`[GPT_REPLY] input=<invalid> | output=<default> | NOTE: Invalid input, returning default response.`);
+    return "Thanks for sharing! I'm here for you 🤗";
+  }
 
+  // Log input
+  console.log(
+    `[GPT_REPLY] input=<${rawText.substring(0, 50)}...> | vibe=<${parsedEntry.vibe.join(', ')}> | theme=<${parsedEntry.theme.join(', ')}> | carryIn=<${carryIn}> | emotionFlip=<${emotionalFlip}>`
+  );
+
+  // Check if this is the 100th entry or later
+  const isHundredthEntry = entryStorage.getEntryCount() >= 99;
+
+  // Use profile-based reply for 100th entry
+  if (isHundredthEntry) {
+    const response = generateProfileBasedReply(rawText, parsedEntry, profile, carryIn, emotionalFlip);
+    console.log(`[GPT_REPLY] output=<${response}> | length=<${response.length}> | NOTE: Generated profile-based response for 100th+ entry.`);
+    return response;
+  }
   // Analyze the emotional context
   const isPositive = parsedEntry.vibe.some(vibe => 
     ['positive', 'happy', 'excited', 'accomplished', 'grateful', 'joyful'].includes(vibe)
@@ -93,39 +118,57 @@ export function generateEmpathicReply(
 }
 
 /**
- * Alternative: Generate response based on dominant profile vibe
+ * Alternative: Generate response based on dominant profile vibe and continuity
+ * Used for 100th entry or later
  */
 export function generateProfileBasedReply(
   rawText: string,
   parsedEntry: ParsedEntry,
-  profile: Profile
+  profile: Profile,
+  carryIn: boolean,
+  emotionFlip: boolean
 ): string {
-  const dominantVibe = profile.dominant_vibe;
+  // Input validation
+  if (!rawText || !parsedEntry || !profile) {
+    return "Thanks for sharing! I'm here for you 🤗";
+  }
+
+  const dominantVibe = profile.dominant_vibe || 'neutral';
   const recentThemes = profile.last_theme;
   
   let response = "";
-  
-  // Check if this entry continues a theme
-  const themeContinuation = recentThemes.some((theme: string) => 
-    parsedEntry.theme.includes(theme)
-  );
-  
-  if (themeContinuation) {
-    response = "You're really exploring this! Love the consistency 🔄";
-  } else if (dominantVibe === 'positive' && parsedEntry.vibe.includes('positive')) {
+
+  // Priority 1: Continuity with carryIn
+  if (carryIn) {
+    response = `Still on ${recentThemes || "this"}? Keep it up! 🔄`;
+  }
+  // Priority 2: Vibe shift with emotionFlip
+  else if (emotionFlip) {
+    response = `New vibe today? You're evolving! 🌟`;
+  }
+  // Priority 3: Match dominant vibe
+  else if (dominantVibe === 'positive' && parsedEntry.vibe.includes('positive')) {
     response = "Your positivity is inspiring! Keep it up! 🌟";
   } else if (dominantVibe === 'neutral' && parsedEntry.vibe.includes('positive')) {
     response = "Love this shift! You're finding your groove! ✨";
   } else if (dominantVibe === 'positive' && parsedEntry.vibe.some(v => ['sad', 'angry', 'frustrated'].includes(v))) {
     response = "It's okay to have tough days. You're still amazing! 💪";
-  } else {
-    response = "Every entry shapes your story. Keep writing! 📝";
+  }
+
+  // Priority 4: Theme-based response
+  else if (recentThemes.some(theme => parsedEntry.theme.includes(theme))) {
+    response = `Back to ${recentThemes[0]}? Love your focus! 📚`;
   }
   
+  // Default
+  else {
+    response = "Every entry shapes your story. Keep writing! 📝";
+  }
+
   // Ensure response is <= 55 characters
   if (response.length > 55) {
     response = response.substring(0, 52) + "...";
   }
-  
+
   return response;
-} 
+}

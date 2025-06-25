@@ -1,10 +1,12 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
-import { extractEmbedding } from "./steps/embedding";
+import { extractEmbedding, cosineSimilarity } from "./steps/embedding";
 import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";
-import { generateEmpathicReply } from "./steps/gptReply";
+import { generateEmpathicReply, generateProfileBasedReply } from "./steps/gptReply";
+import { checkCarryIn } from "./steps/carryIn";
+import { checkContrast } from "./steps/contrastCheck";
 import { parseEntry } from "./steps/parseEntry";
 import { publishEntry } from "./steps/publish";
 import { v4 as uuidv4 } from "uuid";
@@ -33,35 +35,29 @@ export async function runPipeline(text: string) {
   console.log(`[PARSE_ENTRY] input=<${rawText.substring(0, 50)}...> | output=<${parsedEntry.theme.join(', ')}> | note=<Parsed entry fields>`);
 
   // Step 7 - CARRY_IN - Check if theme/vibe overlap or cosine > 0.86
-  // TODO: Implement carry-in logic
+  const carryIn = checkCarryIn(parsedEntry, embedding, recentEntries);
 
 
   // Step 8 - CONTRAST_CHECK - Compare new vibe vs dominant profile vibe
-  // TODO: Implement contrast checking
-  
+  const emotionFlip = checkContrast(parsedEntry, currentProfile);
+ 
 
   // Step 9 - PROFILE_UPDATE - Mutate profile fields
-  const updatedProfile = updateProfile(currentProfile, parsedEntry);
+  const updatedProfile = updateProfile(currentProfile, parsedEntry, carryIn, emotionFlip);
   await profileManager.saveProfile(updatedProfile);
 
   // Step 10 - SAVE_ENTRY - Save full object
-  const savedEntry = await entryStorage.saveEntry(
-    rawText,
-    parsedEntry,
-    metaData,
-    embedding
-  );
+  const savedEntry = await entryStorage.saveEntry(rawText, parsedEntry, metaData, embedding, carryIn);
 
   // Step 11 - GPT_REPLY - Generate <= 55-char empathic response
-  const empathicResponse = generateEmpathicReply(
-    rawText,
-    parsedEntry,
-    metaData
-  );
+  const empathicResponse = entryStorage.getEntryCount() >= 99
+  ? generateProfileBasedReply(rawText, parsedEntry, currentProfile, carryIn, emotionFlip)
+  : generateEmpathicReply(rawText, parsedEntry, metaData, carryIn, emotionFlip, currentProfile);
+
 
   // Step 12 - PUBLISH - Package `{entryId, response_text, carry_in}`
-  // TODO: Implement publishing logic
   const publishedEntry = publishEntry(uuidv4(), empathicResponse, carryIn);
+
   // Step 13 - COST_LATENCY_LOG - Print mock cost + time used
   const endTime = Date.now();
   const latency = endTime - startTime;
