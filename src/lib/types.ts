@@ -47,3 +47,8 @@ export type PublishedResponse = {
     response_text: string;
     carry_in: boolean;
 };
+
+// Transcript from transcribe.py
+export type TranscriptResponse = {
+    transcript: string;
+};

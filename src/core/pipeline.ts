@@ -1,6 +1,6 @@
 import { extractMetaData } from "./steps/metaExtract";
 import { extractRawText } from "./steps/rawTextIn";
-import { extractEmbedding, cosineSimilarity } from "./steps/embedding";
+import { extractEmbedding } from "./steps/embedding";
 import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";

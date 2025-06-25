@@ -50,7 +50,7 @@ export function updateProfile(currentProfile: Profile, parsedEntry: ParsedEntry,
   // Update last theme
   updatedProfile.last_theme = [...parsedEntry.theme];
 
-  console.log(`[PROFILE_UPDATE] output=<${JSON.stringify(updatedProfile)}> | NOTE: Updated profile with new entry data.`);
+  console.log(`[PROFILE_UPDATE] output=<${JSON.stringify(updatedProfile)}, carryIn: ${carryIn}, emotional_flip: ${emotionalFlip}> | NOTE: Updated profile with new entry data.`);
   
   return updatedProfile;
 } 

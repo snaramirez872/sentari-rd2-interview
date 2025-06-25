@@ -30,7 +30,7 @@ function runPythonTranscriber(
         try {
           resolve(JSON.parse(result));
         } catch (err) {
-          reject(new Error(`Failed to parse JSON: ${result}`));
+          reject(new Error(`Error: ${err}. Failed to parse JSON: ${result}`));
         }
       }
     });
@@ -56,7 +56,10 @@ export async function POST(req: NextRequest) {
   try {
     const { transcript } = await runPythonTranscriber(filename);
     return NextResponse.json({ transcript });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: 'An unknown error occurred.' }, { status: 500 });
   }
 }
