@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { TranscriptResponse } from "@/lib/types";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [audioURL, setAudioURL] = useState<string | null>(null);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<TranscriptResponse | null>(null);
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
