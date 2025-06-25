@@ -6,10 +6,14 @@ import { updateProfile } from "./steps/profileUpdate";
 import { profileManager } from "./steps/profileManager";
 import { entryStorage } from "./steps/entryStorage";
 import { generateEmpathicReply } from "./steps/gptReply";
+import { parseEntry } from "./steps/parseEntry";
 import { publishEntry } from "./steps/publish";
 
 import { v4 as uuidv4 } from "uuid";
 export async function runPipeline(text: string) {
+  // Start timing for Step 13
+  const startTime = Date.now();
+  
   // Step 1 - RAW_TEXT_IN - Accept the Transcript
   const rawText = extractRawText(text);
 
@@ -56,7 +60,12 @@ export async function runPipeline(text: string) {
   // TODO: Implement publishing logic
   const publishedEntry = publishEntry(uuidv4(), empathicResponse, carryIn);
   // Step 13 - COST_LATENCY_LOG - Print mock cost + time used
-  // TODO: Implement cost and latency logging
+  const endTime = Date.now();
+  const latency = endTime - startTime;
+  const mockCost = 0.001; // $0.001 per entry (mock cost)
+  const mockTokens = 150; // Mock token count
+  
+  console.log(`[COST_LATENCY_LOG] input=<> | output=<latency: ${latency}ms, cost: $${mockCost}, tokens: ${mockTokens}> | note=<Mock cost and latency metrics>`);
 
   return {
     rawText,
