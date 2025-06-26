@@ -121,6 +121,7 @@ export async function runPipeline(text: string) {
     empathicResponse,
     recentEntries: recentEntries.length,
     publishedEntry,
+    carryIn,
     metrics, // Include the metrics in the return
   };
 }
