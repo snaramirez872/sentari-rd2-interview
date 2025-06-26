@@ -74,9 +74,13 @@ class EntryStorage {
    */
   async loadRecentEntries(count: number = 5): Promise<FullEntries[]> {
     const allEntries = await this.loadAllEntries();
-    return allEntries
+    const recentEntries = allEntries
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, count);
+    // Log the actual entries (showing raw_text and parsed fields for clarity)
+    const entrySummaries = recentEntries.map(e => ({raw_text: e.raw_text, parsed: e.parsed}));
+    console.log(`[FETCH_RECENT] input=<count: ${count}> | output=<${JSON.stringify(entrySummaries)}> | note=Loaded last ${count} entries`);
+    return recentEntries;
   }
 
   /**
