@@ -44,7 +44,7 @@ export async function runPipeline(text: string) {
   const currentProfile = await profileManager.loadProfile();
   const step4Latency = Date.now() - step4Start;
   const step4Costs = calculateDatabaseCost('read', 1); // Single profile
-  stepCosts.push(createStepCost("FETCH_PROFILE", step4Latency, step4Costs.cost, step4Costs.processingUnits, "Load user profile data", "database));
+  stepCosts.push(createStepCost("FETCH_PROFILE", step4Latency, step4Costs.cost, step4Costs.processingUnits, "Load user profile data", "database"));
 
   // Step 5 - META_EXTRACT - Extract top words, length, punctuation flags
   const step5Start = Date.now();
