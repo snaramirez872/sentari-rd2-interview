@@ -1,6 +1,6 @@
-# Sentari Pipeline Cost Breakdown
+# Pipeline Cost Breakdown
 
-This document explains the reasoning behind our **dynamic token and cost calculations** for each step in the Sentari pipeline.
+This document explains the reasoning behind our **dynamic token and cost calculations** for each step in the pipeline.
 
 ## Overview
 
@@ -197,14 +197,6 @@ function calculateAITokenCost(tokens: number, model: 'gpt' | 'embedding'): numbe
   return (tokens / 1000) * pricePer1K;
 }
 ```
-
-## Optimization Opportunities
-
-1. **Embedding Caching**: Cache embeddings for repeated themes
-2. **Profile Batching**: Batch profile updates for multiple entries
-3. **Response Templates**: Use templated responses for common scenarios
-4. **Database Indexing**: Optimize database queries for faster retrieval
-5. **Token Optimization**: Minimize context length for AI operations
 
 ## Future Cost Considerations
 
