@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { runPipeline } from "@/core/pipeline";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
@@ -27,10 +26,13 @@ export default function Home() {
         const response = await fetch('/entries.csv')
         const text = await response.text()
         const entries = text.split('\n').filter(line => line.trim() !== '');
-        entries.forEach(async (entry) => {
-          const pipelineRespone = await runPipeline(entry)
-          console.log(pipelineRespone)
-        });
+        for (const entry of entries) {
+          await fetch("/api/pipeline", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: entry }),
+          });
+        }
       }
 
       const res = await fetch("http://127.0.0.1:8000/transcribe", {
@@ -39,9 +41,13 @@ export default function Home() {
       });
 
       const data = await res.json();
-      const pipelineRespone = await runPipeline(data.transcript)
-      console.log(pipelineRespone)
-      setResult(pipelineRespone.empathicResponse);
+      const pipelineRes = await fetch("/api/pipeline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: data.transcript }),
+      });
+      const pipelineResponse = await pipelineRes.json();
+      setResult(pipelineResponse.empathicResponse);
     };
 
     mediaRecorder.start();
