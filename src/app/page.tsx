@@ -23,6 +23,16 @@ export default function Home() {
       const formData = new FormData();
       formData.append("audio", blob, "recording.webm");
 
+      if (process.env.NEXT_PUBLIC_SIMULATE === 'hundred'){
+        const response = await fetch('/entries.csv')
+        const text = await response.text()
+        const entries = text.split('\n').filter(line => line.trim() !== '');
+        entries.forEach(async (entry) => {
+          const pipelineRespone = await runPipeline(entry)
+          console.log(pipelineRespone)
+        });
+      }
+
       const res = await fetch("http://127.0.0.1:8000/transcribe", {
         method: "POST",
         body: formData,
