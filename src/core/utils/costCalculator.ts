@@ -1,3 +1,5 @@
+import { ParsedEntry } from "@/lib/types";
+
 /**
  * Dynamic Cost Calculator for Sentari Pipeline
  * Calculates realistic token counts and processing units based on actual data
@@ -75,7 +77,7 @@ export function calculateEmbeddingCost(text: string): { tokens: number; cost: nu
  */
 export function calculateGPTReplyCost(
   inputText: string, 
-  parsedEntry: any, 
+  parsedEntry: ParsedEntry, 
   responseText: string
 ): { tokens: number; cost: number } {
   // Build input context
