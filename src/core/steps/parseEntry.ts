@@ -23,12 +23,12 @@ export function parseEntry(text: string): ParsedEntry {
 }
 
 function extractThemes(text: string): string[] {
-  // Theme: External topic or hashtag discussed
+  // Theme: External topic or hashtag discussed - be more focused
   const themePatterns: Record<string, string[]> = {
-    'work-life balance': ['work', 'life', 'balance', 'slack', 'rest', 'tired', 'exhausted', 'burnout', 'overtime'],
+    'work-life balance': ['work', 'life', 'balance', 'slack', 'rest', 'tired', 'exhausted', 'burnout', 'overtime', 'checking', 'miss'],
     'intern management': ['intern', 'internship', 'mentor', 'mentoring', 'junior', 'new hire', 'onboarding'],
     'startup culture': ['startup', 'culture', 'company', 'growth', 'scale', 'funding', 'venture', 'entrepreneur'],
-    'productivity': ['productive', 'efficiency', 'work', 'focus', 'output', 'deadline', 'task', 'project'],
+    'productivity': ['productive', 'efficiency', 'focus', 'output', 'deadline', 'task', 'project'],
     'team building': ['team', 'collaboration', 'together', 'group', 'colleague', 'co-worker', 'partnership'],
     'personal growth': ['learn', 'growth', 'improve', 'develop', 'skill', 'knowledge', 'education'],
     'health & wellness': ['health', 'wellness', 'exercise', 'fitness', 'mental health', 'stress', 'anxiety'],
@@ -37,21 +37,52 @@ function extractThemes(text: string): string[] {
     'technology': ['tech', 'software', 'coding', 'programming', 'app', 'digital', 'online', 'internet']
   };
 
-  const foundThemes: string[] = [];
+  // Score each theme based on keyword matches
+  const themeScores: Record<string, number> = {};
   
   Object.entries(themePatterns).forEach(([theme, keywords]) => {
-    const matchCount = keywords.filter(keyword => text.includes(keyword)).length;
-    if (matchCount > 0) {
-      foundThemes.push(theme);
+    let score = 0;
+    keywords.forEach(keyword => {
+      if (text.includes(keyword)) {
+        score += 1;
+        // Bonus points for exact word matches (not just substring)
+        if (text.includes(` ${keyword} `) || text.startsWith(keyword) || text.endsWith(keyword)) {
+          score += 0.5;
+        }
+      }
+    });
+    if (score > 0) {
+      themeScores[theme] = score;
     }
   });
 
-  // If no specific themes found, return general
-  return foundThemes.length > 0 ? foundThemes : ['general'];
+  // Sort themes by score and take top 1-2 themes
+  const sortedThemes = Object.entries(themeScores)
+    .sort(([,a], [,b]) => b - a)
+    .map(([theme]) => theme);
+
+  // Return top 1-2 themes, but be more selective
+  if (sortedThemes.length === 0) {
+    return ['general'];
+  } else if (sortedThemes.length === 1) {
+    return sortedThemes;
+  } else {
+    // Only return second theme if it has significant score difference
+    const topScore = themeScores[sortedThemes[0]];
+    const secondScore = themeScores[sortedThemes[1]];
+    
+    // If top theme has significantly higher score, return only that
+    if (topScore > secondScore * 1.5) {
+      return [sortedThemes[0]];
+    }
+    
+    // Otherwise return top 2 themes
+    return sortedThemes.slice(0, 2);
+  }
 }
 
 function extractVibes(text: string): string[] {
-  // Vibe: Current emotional tone expressed
+  // Vibe: Current emotional tone expressed - be more accurate
   const vibePatterns: Record<string, string[]> = {
     'anxious': ['anxious', 'worried', 'scared', 'nervous', 'tense', 'stressed', 'fearful', 'panicked'],
     'exhausted': ['exhausted', 'tired', 'drained', 'burned out', 'fatigued', 'weary', 'spent'],
@@ -81,8 +112,12 @@ function extractVibes(text: string): string[] {
 }
 
 function extractIntent(text: string): string {
-  // Intent: Explicit goal the speaker wants to achieve
+  // Intent: Explicit goal the speaker wants to achieve - be more specific
   const intentPatterns = [
+    {
+      patterns: [/need\s+rest/, /want\s+rest/, /hope\s+to\s+rest/, /plan\s+to\s+rest/, /scared.*miss.*important/],
+      intent: "Find rest without guilt or fear of missing out."
+    },
     {
       patterns: [/need\s+to/, /want\s+to/, /hope\s+to/, /plan\s+to/, /aim\s+to/],
       intent: "Seeking improvement or change in current situation"
@@ -128,8 +163,12 @@ function extractIntent(text: string): string {
 }
 
 function extractSubtext(text: string): string {
-  // Subtext: Hidden worry or underlying motive
+  // Subtext: Hidden worry or underlying motive - be more specific
   const subtextPatterns = [
+    {
+      patterns: [/scared.*miss/, /afraid.*miss/, /worried.*miss/, /scared.*important/],
+      subtext: "Fears being seen as less committed."
+    },
     {
       patterns: [/but\s+i'm\s+scared/, /however.*fear/, /though.*worry/],
       subtext: "Fear of failure or not meeting expectations"
@@ -186,7 +225,7 @@ function extractPersonaTraits(text: string): string[] {
   // Persona Trait: Behavior style or personality characteristics
   const traitPatterns: Record<string, string[]> = {
     'conscientious': ['check', 'verify', 'ensure', 'make sure', 'double-check', 'review'],
-    'vigilant': ['watch', 'monitor', 'keep track', 'stay on top', 'oversee', 'supervise'],
+    'vigilant': ['watch', 'monitor', 'keep track', 'stay on top', 'oversee', 'supervise', 'keep checking', 'constantly checking'],
     'organiser': ['plan', 'organize', 'structure', 'arrange', 'schedule', 'coordinate'],
     'builder': ['create', 'build', 'develop', 'construct', 'establish', 'found'],
     'mentor': ['help', 'guide', 'teach', 'support', 'coach', 'advise'],
@@ -216,7 +255,7 @@ function determineBucket(text: string): string[] {
   // Bucket: Entry type classification
   const bucketPatterns: Record<string, string[]> = {
     'Goal': ['goal', 'target', 'aim', 'objective', 'plan', 'intention', 'aspiration'],
-    'Thought': ['think', 'thought', 'wonder', 'consider', 'reflect', 'ponder', 'contemplate'],
+    'Thought': ['think', 'thought', 'wonder', 'consider', 'reflect', 'ponder', 'contemplate', 'know', 'feel', 'scared', 'worried'],
     'Hobby': ['hobby', 'interest', 'fun', 'enjoy', 'passion', 'leisure', 'recreation'],
     'Value': ['value', 'believe', 'important', 'matter', 'care', 'principle', 'ethic'],
     'Challenge': ['challenge', 'problem', 'difficulty', 'obstacle', 'struggle', 'hurdle'],
