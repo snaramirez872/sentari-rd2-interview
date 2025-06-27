@@ -15,6 +15,10 @@ Implemented a 13-step pipeline that processes diary transcripts into emotionally
 - `backend/` — FastAPI server for audio transcription and embeddings
 
 ## Install
+**Clone**
+```sh
+git clone https://github.com/snaramirez872/sentari-rd2-interview
+```
 
 **Frontend (Next.js + React):**
 ```sh
