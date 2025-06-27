@@ -54,5 +54,25 @@ Visit [http://localhost:3000](http://localhost:3000) to use the app.
 npm test
 ```
 
+## Meet the Team!
+- Team Lead: Aditya Thakare | [LinkedIn](https://www.linkedin.com/in/aditya-thakare-990833150/)
+    - Responsible for `CARRY_IN` and `CONTRAST_CHECK`
+- Associate Team Lead: Hector Qui&ntilde;ones | [GitHub](https://github.com/hquino1)
+    - Responsible for `EMBEDDING`
+    - Implemented Back End
+- Christina Murphy | [LinkedIn](https://www.linkedin.com/in/christinajmurphy/)
+    - Responsible for `RAW_TEXT_IN` and `PUBLISH`
+    - Implemented Front End
+- Jiawei Lin | [LinkedIn](https://www.linkedin.com/in/jiawei-lin-349809259/)
+    - Responsible for `FETCH_RECENT` and `FETCH_PROFILE`
+    - Implemented Local Storage Saving (SIngle User Case)
+- Sean Ramirez | [LinkedIn](https://www.linkedin.com/in/seanaramirez/) | [Website](https://seanramirez.vercel.app/)
+    - Responsible for `META_EXTRACT`
+    - Implemented Test Suite (with assistance from Amarnath, Christina, and Hector)
+- Amarnath Kaushik | [LinkedIn](https://www.linkedin.com/in/amarnathskaushik/)
+    - Responsible for `PARSE_ENTRY` and `COST_LATENCY_LOG`
+- Preetham Dandu | [LinkedIn](https://www.linkedin.com/in/preetham-dandu/)
+    - Responsible for `PROFILE_UPDATE`, `SAVE_ENTRY`, and `GPT_REPLY`
+
 ## License
 MIT
